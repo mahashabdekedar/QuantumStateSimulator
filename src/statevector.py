@@ -9,8 +9,7 @@ class statevector:
         if numQubits > 5:
             raise ValueError('Too many qubits!')
         self.dimension = numQubits
-        self.state = np.ndarray(2**numQubits, dtype=np.cdouble).reshape(np.ones(numQubits)*2)
-        (self.state(tuple(np.ones(numQubits))))
+        self.state = np.full(tuple(np.full(numQubits, 2)), 1 / np.sqrt(2), dtype=np.cdouble)
 
     def isvalid(self) -> bool:
         return np.isclose(np.linalg.norm(self.state), 1)
@@ -21,7 +20,7 @@ class statevector:
     def densityMatrix(self):
         return self.state.T @ self.state
 
-    def measure(self, qubit: int) -> int:
+    def measure(self, qubit: int = 0) -> int:
         # Pick a cutoff
         r = random.uniform(0, 1)
         # Get the desired qubit
@@ -31,7 +30,7 @@ class statevector:
         idx[qubit] = (0, 1)
 
         # Collapse the state and return the measurement
-        if r < abs(amplitudes[0]):
+        if r < abs(amplitudes[0])**2:
             self.state[idx] = [1, 0]
             return 0
         else:
